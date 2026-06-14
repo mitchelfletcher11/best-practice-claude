@@ -14,6 +14,46 @@ Checks all Anthropic resources for updates since the last run and surfaces concr
 
 ---
 
+## Step 0 — Preflight: self-setup (first run)
+
+This skill **auto-runs once per 24h** via a `UserPromptSubmit` hook + script, and it
+reads a list of Anthropic source URLs. Detect both and offer to set up what's missing
+— but **never install executable code without an explicit yes.**
+
+**1. Auto-run script + hook** (the same shared `check-best-practice.sh`):
+```bash
+if [ -f ~/.claude/skills/best-practice-claude/.no-autorun ]; then echo SKIP
+elif [ -x ~/.claude/scripts/check-best-practice.sh ] && grep -q check-best-practice ~/.claude/settings.json 2>/dev/null; then echo INSTALLED
+else echo OFFER; fi
+```
+- `INSTALLED` / `SKIP` → go to step 2 below.
+- `OFFER` → **warn + ask, and wait** (never on an implied yes):
+  > ⚠️ **Auto-run setup installs executable code on your machine.** I'd **download a script** to `~/.claude/scripts/check-best-practice.sh` (executable; reads a local timestamp, prints a reminder once/24h — **no network calls**) and add a **`UserPromptSubmit` hook** to `~/.claude/settings.json` that runs it **on every prompt**. **Install now? (yes / no)** — on *no* you can run `/best-practice-claude` manually.
+
+  On explicit **yes**:
+  ```bash
+  mkdir -p ~/.claude/scripts
+  curl -sf https://raw.githubusercontent.com/mitchelfletcher11/best-practice-claude/main/check-best-practice.sh \
+    -o ~/.claude/scripts/check-best-practice.sh
+  chmod +x ~/.claude/scripts/check-best-practice.sh
+  ```
+  then **show this hook JSON and merge it only on a second confirmation** (append to `hooks.UserPromptSubmit`):
+  ```json
+  { "hooks": { "UserPromptSubmit": [ { "hooks": [ { "type": "command", "command": "bash ~/.claude/scripts/check-best-practice.sh" } ] } ] } }
+  ```
+  On **no**: `touch ~/.claude/skills/best-practice-claude/.no-autorun` and say *"run `/best-practice-claude` manually anytime."*
+
+**2. Anthropic source list** (no prompt — self-heals from a bundled copy):
+```bash
+ls ~/.claude/skills/claude-api/shared/live-sources.md 2>/dev/null \
+  || ls ~/.claude/skills/best-practice-claude/live-sources.md 2>/dev/null || echo NONE
+```
+- Found at either path → use it in Step 2.
+- `NONE` → this skill **ships its own copy** at `~/.claude/skills/best-practice-claude/live-sources.md`; if it's somehow missing, fetch it (data file, not executable — no warning needed):
+  `curl -sf https://raw.githubusercontent.com/mitchelfletcher11/best-practice-claude/main/live-sources.md -o ~/.claude/skills/best-practice-claude/live-sources.md`
+
+---
+
 ## Step 1 — Check cadence
 
 Read `~/.claude/skills/best-practice-claude/last-check.md`. Compare the stored ISO 8601 timestamp against the current time.
@@ -27,7 +67,7 @@ Read `~/.claude/skills/best-practice-claude/last-check.md`. Compare the stored I
 
 Read both source files in full:
 
-1. `~/.claude/skills/claude-api/shared/live-sources.md` — extract every URL and its extraction prompt from every table in the document
+1. `~/.claude/skills/claude-api/shared/live-sources.md` if present, **else** the bundled `~/.claude/skills/best-practice-claude/live-sources.md` (Step 0 guarantees one exists) — extract every URL and its extraction prompt from every table in the document
 2. `~/.claude/skills/best-practice-claude/additional-resources.md` — extract every URL and its extraction prompt
 
 Compile a single deduplicated list of all URLs with their extraction prompts.

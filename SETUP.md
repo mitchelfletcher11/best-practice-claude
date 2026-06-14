@@ -1,5 +1,10 @@
 # Setup — best-practice-claude
 
+> **You don't have to follow this by hand.** On first run the skill's **Step 0
+> Preflight detects what's missing and offers to set it up for you** — with a
+> security warning + explicit confirmation before writing the script or wiring the
+> hook. This file is the manual / reference path.
+
 Two machine-specific pieces beyond the skill file: the **trigger script** and the
 **settings hook**. Both are portable (`$HOME`/`~` based) and carry no secrets.
 
