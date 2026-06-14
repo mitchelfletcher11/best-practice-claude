@@ -1,5 +1,8 @@
 # Changelog
 
+## v1.2.0 — 2026-06-14
+Preflight now checks `curl` is installed before downloading the auto-run script (zero-state).
+
 ## v1.1.0 — 2026-06-14
 - Self-bootstrapping **Step 0 Preflight**: detects the missing auto-run script + hook
   and offers to set them up — security warning + explicit confirmation before any

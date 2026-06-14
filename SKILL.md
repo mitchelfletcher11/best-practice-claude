@@ -30,7 +30,8 @@ else echo OFFER; fi
 - `OFFER` → **warn + ask, and wait** (never on an implied yes):
   > ⚠️ **Auto-run setup installs executable code on your machine.** I'd **download a script** to `~/.claude/scripts/check-best-practice.sh` (executable; reads a local timestamp, prints a reminder once/24h — **no network calls**) and add a **`UserPromptSubmit` hook** to `~/.claude/settings.json` that runs it **on every prompt**. **Install now? (yes / no)** — on *no* you can run `/best-practice-claude` manually.
 
-  On explicit **yes**:
+  On explicit **yes** (first confirm `curl` exists — `command -v curl`; if absent, give the one
+  install command for their platform, e.g. `sudo apt install curl`, and stop until present):
   ```bash
   mkdir -p ~/.claude/scripts
   curl -sf https://raw.githubusercontent.com/mitchelfletcher11/best-practice-claude/main/check-best-practice.sh \
