@@ -79,6 +79,8 @@ Compile a single deduplicated list of all URLs with their extraction prompts.
 
 WebFetch every URL from Step 2. Apply each URL's extraction prompt when fetching.
 
+**Retry once on transient failure:** if a WebFetch fails with a connection-level error (ConnectionRefused, timeout, "unable to connect") rather than a real HTTP status, retry it once before treating the source as unreachable — these are usually transient and recover on the second attempt.
+
 **404 fallback:** For any URL that returned 404, run `WebSearch [topic] site:platform.claude.com` to locate the current URL, then WebFetch the found URL. If the correct URL differs from what is in the source file, update `~/.claude/skills/best-practice-claude/additional-resources.md` with the corrected URL before continuing.
 
 Filter findings: keep only content that is dated AFTER the timestamp stored in `last-check.md`. Discard anything older.
@@ -138,6 +140,8 @@ What changed:
 ```
 
 Emoji key: ✅ Keep · 🔄 Update · ➕ Add · ❌ Remove
+
+**Keep this key on EVERY item — always.** Never strip the emojis, including when consolidating or re-summarizing multiple proposal lists (e.g. merging both sweeps' outputs into a single table or summary). The emoji is how the reader tells add-vs-update-vs-keep-vs-remove at a glance; a plain numbered list loses that orientation.
 
 After the numbered list ask: **"Apply all, apply selected (list numbers), or skip?"**
 

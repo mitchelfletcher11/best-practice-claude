@@ -1,5 +1,10 @@
 # Changelog
 
+## v1.2.1 — 2026-07-04
+- Keep the emoji status key (➕🔄✅❌) on every proposal item, including when consolidating/re-summarizing multiple proposal lists.
+- Retry a WebFetch once on a transient connection-level failure before treating a source as unreachable.
+- Point the Claude Code overview source at `code.claude.com/docs`.
+
 ## v1.2.0 — 2026-06-14
 Preflight now checks `curl` is installed before downloading the auto-run script (zero-state).
 
